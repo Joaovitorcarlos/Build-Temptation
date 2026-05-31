@@ -4,29 +4,48 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
 {
     [Header("UI")]
     public InputField nomeSala;
     public Text erro;
-    public Canvas telaEntrarSala;
-
-    [Header("Music")]
-    public AudioSource musica;
+    public Button btnIniciarPartida;
 
     private NetworkRunner runner;
+    private bool partidaIniciada;
 
-    private bool matchStarted;
-    private bool musicStarted;
+    void Start()
+    {
+        SafeSetActive(btnIniciarPartida, false);
+        SafeSetText(erro, "");
+    }
 
-    private int localScore;
-    private int localCombo;
+    // =========================
+    // SAFE HELPERS (ANTI CRASH)
+    // =========================
+    void SafeSetActive(GameObject obj, bool value)
+    {
+        if (obj != null)
+            obj.SetActive(value);
+    }
 
-    //==================================================
-    // CREATE RUNNER
-    //==================================================
+    void SafeSetActive(Component comp, bool value)
+    {
+        if (comp != null)
+            comp.gameObject.SetActive(value);
+    }
+
+    void SafeSetText(Text t, string value)
+    {
+        if (t != null)
+            t.text = value;
+    }
+
+    // =========================
+    // RUNNER
+    // =========================
     async Task CriarRunner()
     {
         if (runner != null)
@@ -37,75 +56,75 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         runner = gameObject.AddComponent<NetworkRunner>();
+
+        if (runner == null)
+        {
+            Debug.LogError("Falha ao criar NetworkRunner");
+            return;
+        }
+
         runner.ProvideInput = true;
         runner.AddCallbacks(this);
     }
 
-    //==================================================
-    // ENTER ROOM (LOBBY)
-    //==================================================
+    // =========================
+    // ENTRAR SALA
+    // =========================
     public async void EntrarSala()
     {
-        if (string.IsNullOrWhiteSpace(nomeSala.text))
+        if (nomeSala == null || string.IsNullOrWhiteSpace(nomeSala.text))
         {
-            erro.text = "Digite o nome da sala";
+            SafeSetText(erro, "Digite o nome da sala");
             return;
         }
 
+        SafeSetActive(btnIniciarPartida, false);
+
         await CriarRunner();
+
+        if (runner == null)
+        {
+            SafeSetText(erro, "Runner não inicializado");
+            return;
+        }
 
         var result = await runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = nomeSala.text,
-
-            // ✔ IMPORTANTE: NÃO CARREGA CENA AQUI
             Scene = SceneRef.None,
-
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
 
         if (!result.Ok)
         {
-            erro.text = "Erro ao entrar na sala";
+            SafeSetText(erro, "Erro ao entrar na sala");
             Debug.LogError(result.ShutdownReason);
             return;
         }
 
-        telaEntrarSala.gameObject.SetActive(false);
-
-        Debug.Log("Entrou no lobby!");
+        Debug.Log("Entrou na sala: " + nomeSala.text);
     }
 
-    //==================================================
-    // PLAYER JOINED
-    //==================================================
+    // =========================
+    // PLAYERS
+    // =========================
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log("Player entrou: " + player);
-
-        CheckStartGame();
+        AtualizarLobby();
     }
 
-    //==================================================
-    // PLAYER LEFT
-    //==================================================
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log("Player saiu: " + player);
-
-        matchStarted = false;
+        AtualizarLobby();
     }
 
-    //==================================================
-    // CHECK LOBBY STATE
-    //==================================================
-    void CheckStartGame()
+    // =========================
+    // BOTÃO HOST
+    // =========================
+    void AtualizarLobby()
     {
         if (runner == null)
-            return;
-
-        if (matchStarted)
             return;
 
         int count = 0;
@@ -113,116 +132,75 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
         foreach (var p in runner.ActivePlayers)
             count++;
 
-        Debug.Log("Players na sala: " + count);
+        bool show = runner.IsSharedModeMasterClient && count >= 2;
 
-        if (count < 2)
-            return;
-
-        if (!runner.IsSharedModeMasterClient)
-            return;
-
-        matchStarted = true;
-
-        Invoke(nameof(StartMatch), 2f);
+        if (btnIniciarPartida != null)
+            btnIniciarPartida.gameObject.SetActive(show);
     }
 
-    //==================================================
-    // START MATCH (CHANGE SCENE)
-    //==================================================
-    void StartMatch()
+    // =========================
+    // INICIAR PARTIDA
+    // =========================
+    public void IniciarPartida()
     {
-        Debug.Log("2 players conectados → carregando gameplay");
-
-        runner.LoadScene(SceneRef.FromIndex(1));
-    }
-
-    //==================================================
-    // SCENE READY
-    //==================================================
-    public void OnSceneLoadDone(NetworkRunner runner)
-    {
-        Debug.Log("Cena carregada");
-
-        StartMusic();
-    }
-
-    //==================================================
-    // MUSIC
-    //==================================================
-    void StartMusic()
-    {
-        if (musicStarted)
+        if (runner == null || !runner.IsSharedModeMasterClient)
             return;
 
-        musicStarted = true;
-        musica.Play();
-
-        Debug.Log("Música iniciada");
+        RPC_IniciarPartida();
     }
 
-    //==================================================
-    // UPDATE
-    //==================================================
-    void Update()
+    // =========================
+    // RPC GLOBAL
+    // =========================
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_IniciarPartida()
     {
-        if (runner == null)
+        if (partidaIniciada)
             return;
 
-        HandleInput();
-    }
+        partidaIniciada = true;
 
-    void HandleInput()
-    {
-        if (!musicStarted)
-            return;
+        int indexLocal = -1;
+        int index = 0;
 
-        var kb = Keyboard.current;
-        if (kb == null)
-            return;
-
-        if (kb.aKey.wasPressedThisFrame) HitLane(0);
-        if (kb.sKey.wasPressedThisFrame) HitLane(1);
-        if (kb.dKey.wasPressedThisFrame) HitLane(2);
-        if (kb.fKey.wasPressedThisFrame) HitLane(3);
-    }
-
-    void HitLane(int lane)
-    {
-        Debug.Log($"Player {runner.LocalPlayer} lane {lane}");
-
-        if (CheckHit(lane))
+        foreach (var p in runner.ActivePlayers)
         {
-            localCombo++;
-            localScore += 1000;
+            if (p == runner.LocalPlayer)
+                indexLocal = index;
+
+            index++;
+        }
+
+        if (indexLocal == 0)
+        {
+            Debug.Log("Player 1 -> Fase1");
+            SceneManager.LoadScene("Fase1");
         }
         else
         {
-            localCombo = 0;
+            Debug.Log("Player 2 -> Fase2");
+            SceneManager.LoadScene("Fase2");
         }
     }
 
-    bool CheckHit(int lane)
-    {
-        return true;
-    }
-
-    //==================================================
-    // REQUIRED CALLBACKS
-    //==================================================
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
+    // =========================
+    // CALLBACKS OBRIGATÓRIOS
+    // =========================
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     public void OnSceneLoadStart(NetworkRunner runner) { }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, System.ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }     
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
 }

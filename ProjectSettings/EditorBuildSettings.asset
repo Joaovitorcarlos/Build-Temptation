@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Fase1.unity
     guid: c93627916c3e3264db07a3acc878799c
+  - enabled: 1
+    path: Assets/Scenes/Fase2.unity
+    guid: b1beb9e6a4f05d94ca92ae751f8e9c50
   - enabled: 0
     path: Assets/Scenes/Partida.unity
     guid: f1825f7450205a04f8f41417eabf4ac6
