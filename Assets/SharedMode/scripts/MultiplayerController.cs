@@ -13,6 +13,10 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
     public Text erro;
     public Button btnIniciarPartida;
 
+    [Header("DEBUG")]
+    public int debugPlayersExtras = 0;
+    public bool debugMostrarBotaoSempre = true;
+
     private NetworkRunner runner;
     private bool partidaIniciada;
 
@@ -23,7 +27,7 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
     }
 
     // =========================
-    // SAFE HELPERS (ANTI CRASH)
+    // SAFE HELPERS
     // =========================
     void SafeSetActive(GameObject obj, bool value)
     {
@@ -103,7 +107,9 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
             return;
         }
 
-        Debug.Log("Entrou na sala: " + nomeSala.text);
+        Debug.Log($"[ROOM] Entrou na sala: {nomeSala.text}");
+        Debug.Log($"[ROOM] LocalPlayer: {runner.LocalPlayer.PlayerId}");
+        Debug.Log($"[ROOM] IsMasterClient: {runner.IsSharedModeMasterClient}");
     }
 
     // =========================
@@ -111,16 +117,32 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
     // =========================
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
+        Debug.Log($"[JOIN] Player entrou: {player.PlayerId}");
+
+        int total = 0;
+        foreach (var p in runner.ActivePlayers)
+            total++;
+
+        Debug.Log($"[JOIN] Total de players na sala: {total}");
+
         AtualizarLobby();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        Debug.Log($"[LEAVE] Player saiu: {player.PlayerId}");
+
+        int total = 0;
+        foreach (var p in runner.ActivePlayers)
+            total++;
+
+        Debug.Log($"[LEAVE] Total de players na sala: {total}");
+
         AtualizarLobby();
     }
 
     // =========================
-    // BOTÃO HOST
+    // LOBBY DEBUG
     // =========================
     void AtualizarLobby()
     {
@@ -129,13 +151,38 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
 
         int count = 0;
 
-        foreach (var p in runner.ActivePlayers)
-            count++;
+        Debug.Log("========== LOBBY ==========");
 
-        bool show = runner.IsSharedModeMasterClient && count >= 2;
+        foreach (var p in runner.ActivePlayers)
+        {
+            count++;
+            Debug.Log($"[LOBBY] Player ativo: {p.PlayerId}");
+        }
+
+        Debug.Log($"[LOBBY] Players reais: {count}");
+
+        count += debugPlayersExtras;
+
+        Debug.Log($"[LOBBY] Players após debugPlayersExtras: {count}");
+
+        bool show;
+
+        if (debugMostrarBotaoSempre)
+        {
+            show = true;
+            Debug.Log("[DEBUG] Botão iniciar forçado para aparecer.");
+        }
+        else
+        {
+            show = runner.IsSharedModeMasterClient && count >= 2;
+        }
+
+        Debug.Log($"[LOBBY] Mostrar botão iniciar: {show}");
 
         if (btnIniciarPartida != null)
             btnIniciarPartida.gameObject.SetActive(show);
+
+        Debug.Log("===========================");
     }
 
     // =========================
@@ -143,14 +190,13 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
     // =========================
     public void IniciarPartida()
     {
-        if (runner == null || !runner.IsSharedModeMasterClient)
-            return;
+        Debug.Log($"[START] Botão clicado por Player {runner.LocalPlayer.PlayerId}");
 
         RPC_IniciarPartida();
     }
 
     // =========================
-    // RPC GLOBAL
+    // RPC
     // =========================
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_IniciarPartida()
