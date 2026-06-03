@@ -1149,8 +1149,7 @@ MonoBehaviour:
   nomeSala: {fileID: 371758919}
   erro: {fileID: 213861995}
   btnIniciarPartida: {fileID: 271594359}
-  debugPlayersExtras: 0
-  debugMostrarBotaoSempre: 1
+  networkGameManager: {fileID: 676206017}
 --- !u!4 &618800456
 Transform:
   m_ObjectHideFlags: 0
@@ -1176,6 +1175,7 @@ GameObject:
   m_Component:
   - component: {fileID: 676206018}
   - component: {fileID: 676206017}
+  - component: {fileID: 676206019}
   m_Layer: 0
   m_Name: NetwokGameMenager
   m_TagString: Untagged
@@ -1211,6 +1211,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &676206019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676206016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 97528368
+  ObjectInterest: 1
+  Flags: 131073
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 676206017}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &695600059
 GameObject:
   m_ObjectHideFlags: 0
@@ -1482,7 +1501,6 @@ GameObject:
   m_Component:
   - component: {fileID: 881982925}
   - component: {fileID: 881982922}
-  - component: {fileID: 881982924}
   - component: {fileID: 881982923}
   m_Layer: 0
   m_Name: Camera
@@ -1586,14 +1604,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!81 &881982924
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 881982921}
-  m_Enabled: 1
 --- !u!4 &881982925
 Transform:
   m_ObjectHideFlags: 0
@@ -1602,12 +1612,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 881982921}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1024, y: 768, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1767334119}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &907941605
 GameObject:
@@ -2975,53 +2985,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1635781178}
   m_CullTransparentMesh: 1
---- !u!1 &1767334117
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1767334119}
-  - component: {fileID: 1767334118}
-  m_Layer: 0
-  m_Name: 'CAmeraMenager '
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1767334118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1767334117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd5455302bf627241bf3553224d2659b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraPlayer1: {fileID: 330585545}
-  cameraPlayer2: {fileID: 881982922}
---- !u!4 &1767334119
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1767334117}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1024, y: 768, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 881982925}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1844582225
 GameObject:
   m_ObjectHideFlags: 0
@@ -3678,6 +3641,6 @@ SceneRoots:
   - {fileID: 982533090}
   - {fileID: 299752471}
   - {fileID: 387538626}
-  - {fileID: 1767334119}
+  - {fileID: 881982925}
   - {fileID: 330585546}
   - {fileID: 676206018}

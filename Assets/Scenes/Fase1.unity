@@ -890,6 +890,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objeto: {fileID: 1557900551}
   pontosText: {fileID: 222985227}
+  pontos: 0
 --- !u!1 &899163201
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,8 +1124,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1342177839}
-  - component: {fileID: 1342177838}
-  - component: {fileID: 1342177840}
   m_Layer: 0
   m_Name: CameraMenager
   m_TagString: Untagged
@@ -1132,20 +1131,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1342177838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1342177837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd5455302bf627241bf3553224d2659b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraPlayer1: {fileID: 1365872539}
-  cameraPlayer2: {fileID: 0}
 --- !u!4 &1342177839
 Transform:
   m_ObjectHideFlags: 0
@@ -1162,22 +1147,6 @@ Transform:
   - {fileID: 1365872540}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1342177840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1342177837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbf55f44117c37e4b9ffc59768e9f6e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraPlayer1: {fileID: 1365872539}
-  cameraPlayer2: {fileID: 0}
-  canvasPlayer1: {fileID: 823223690}
-  canvasPlayer2: {fileID: 0}
 --- !u!1 &1363933724
 GameObject:
   m_ObjectHideFlags: 0
@@ -2095,7 +2064,6 @@ GameObject:
   - component: {fileID: 1826450141}
   - component: {fileID: 1826450140}
   - component: {fileID: 1826450142}
-  - component: {fileID: 1826450143}
   m_Layer: 0
   m_Name: Audio Source
   m_TagString: Untagged
@@ -2228,18 +2196,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Audio
   music: {fileID: 1826450140}
   startDelay: 2
---- !u!114 &1826450143
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1826450139}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5dc2dddd91a3604d8e544155a5e9f48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1842068619
 GameObject:
   m_ObjectHideFlags: 0

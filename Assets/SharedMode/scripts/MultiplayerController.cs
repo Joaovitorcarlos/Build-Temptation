@@ -3,8 +3,8 @@ using Fusion.Sockets;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -13,240 +13,157 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
     public Text erro;
     public Button btnIniciarPartida;
 
-    [Header("DEBUG")]
-    public int debugPlayersExtras = 0;
-    public bool debugMostrarBotaoSempre = true;
+    [Header("Referencias")]
+    public NetworkGameManager networkGameManager;
 
     private NetworkRunner runner;
-    private bool partidaIniciada;
 
-    void Start()
-    {
-        SafeSetActive(btnIniciarPartida, false);
-        SafeSetText(erro, "");
-    }
+    private static MultiplayerController instance;
 
-    // =========================
-    // SAFE HELPERS
-    // =========================
-    void SafeSetActive(GameObject obj, bool value)
+    private async void Awake()
     {
-        if (obj != null)
-            obj.SetActive(value);
-    }
+        Debug.Log("MultiplayerController Awake -> " + gameObject.name);
 
-    void SafeSetActive(Component comp, bool value)
-    {
-        if (comp != null)
-            comp.gameObject.SetActive(value);
-    }
-
-    void SafeSetText(Text t, string value)
-    {
-        if (t != null)
-            t.text = value;
-    }
-
-    // =========================
-    // RUNNER
-    // =========================
-    async Task CriarRunner()
-    {
-        if (runner != null)
+        if (instance != null)
         {
-            await runner.Shutdown();
-            Destroy(runner.gameObject);
-            runner = null;
-        }
-
-        runner = gameObject.AddComponent<NetworkRunner>();
-
-        if (runner == null)
-        {
-            Debug.LogError("Falha ao criar NetworkRunner");
+            Debug.Log("MultiplayerController duplicado destruído");
+            Destroy(gameObject);
             return;
         }
+
+        instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
+        runner = GetComponent<NetworkRunner>();
+
+        if (runner == null)
+            runner = gameObject.AddComponent<NetworkRunner>();
 
         runner.ProvideInput = true;
         runner.AddCallbacks(this);
+
+        await Task.CompletedTask;
     }
 
-    // =========================
-    // ENTRAR SALA
-    // =========================
+    private void Start()
+    {
+        Debug.Log("MultiplayerController Start -> " + gameObject.name);
+
+        if (btnIniciarPartida != null)
+            btnIniciarPartida.gameObject.SetActive(false);
+
+        if (erro != null)
+            erro.text = "";
+    }
+
     public async void EntrarSala()
     {
-        if (nomeSala == null || string.IsNullOrWhiteSpace(nomeSala.text))
+        if (string.IsNullOrWhiteSpace(nomeSala.text))
         {
-            SafeSetText(erro, "Digite o nome da sala");
+            if (erro != null)
+                erro.text = "Digite o nome da sala";
+
             return;
         }
 
-        SafeSetActive(btnIniciarPartida, false);
+        var sceneManager = GetComponent<NetworkSceneManagerDefault>();
 
-        await CriarRunner();
+        if (sceneManager == null)
+            sceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
 
-        if (runner == null)
-        {
-            SafeSetText(erro, "Runner não inicializado");
-            return;
-        }
+        var currentScene = SceneManager.GetActiveScene();
 
-        var result = await runner.StartGame(new StartGameArgs()
-        {
-            GameMode = GameMode.Shared,
-            SessionName = nomeSala.text,
-            Scene = SceneRef.None,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-        });
+        StartGameResult result = await runner.StartGame(
+            new StartGameArgs()
+            {
+                GameMode = GameMode.Shared,
+                SessionName = nomeSala.text,
+                Scene = SceneRef.FromIndex(currentScene.buildIndex),
+                SceneManager = sceneManager
+            });
 
         if (!result.Ok)
         {
-            SafeSetText(erro, "Erro ao entrar na sala");
             Debug.LogError(result.ShutdownReason);
+
+            if (erro != null)
+                erro.text = result.ShutdownReason.ToString();
+
             return;
         }
 
-        Debug.Log($"[ROOM] Entrou na sala: {nomeSala.text}");
-        Debug.Log($"[ROOM] LocalPlayer: {runner.LocalPlayer.PlayerId}");
-        Debug.Log($"[ROOM] IsMasterClient: {runner.IsSharedModeMasterClient}");
+        Debug.Log("Entrou na sala " + nomeSala.text);
     }
 
-    // =========================
-    // PLAYERS
-    // =========================
+    public void IniciarPartida()
+    {
+        Debug.Log("BOTAO CLICADO");
+
+        if (networkGameManager == null)
+        {
+            networkGameManager = FindObjectOfType<NetworkGameManager>(true);
+        }
+
+        Debug.Log("networkGameManager = " + networkGameManager);
+
+        if (networkGameManager == null)
+        {
+            Debug.LogError("NetworkGameManager não encontrado na cena");
+            return;
+        }
+
+        networkGameManager.RequestStartMatch();
+    }
+
+    private void AtualizarLobby()
+    {
+        int count = 0;
+
+        foreach (var p in runner.ActivePlayers)
+            count++;
+
+        Debug.Log("Players: " + count);
+
+        if (btnIniciarPartida != null)
+            btnIniciarPartida.gameObject.SetActive(count >= 2);
+    }
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"[JOIN] Player entrou: {player.PlayerId}");
-
-        int total = 0;
-        foreach (var p in runner.ActivePlayers)
-            total++;
-
-        Debug.Log($"[JOIN] Total de players na sala: {total}");
-
+        Debug.Log("Player entrou: " + player.PlayerId);
         AtualizarLobby();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log($"[LEAVE] Player saiu: {player.PlayerId}");
-
-        int total = 0;
-        foreach (var p in runner.ActivePlayers)
-            total++;
-
-        Debug.Log($"[LEAVE] Total de players na sala: {total}");
-
+        Debug.Log("Player saiu: " + player.PlayerId);
         AtualizarLobby();
     }
 
-    // =========================
-    // LOBBY DEBUG
-    // =========================
-    void AtualizarLobby()
+    public void OnConnectedToServer(NetworkRunner runner)
     {
-        if (runner == null)
-            return;
-
-        int count = 0;
-
-        Debug.Log("========== LOBBY ==========");
-
-        foreach (var p in runner.ActivePlayers)
-        {
-            count++;
-            Debug.Log($"[LOBBY] Player ativo: {p.PlayerId}");
-        }
-
-        Debug.Log($"[LOBBY] Players reais: {count}");
-
-        count += debugPlayersExtras;
-
-        Debug.Log($"[LOBBY] Players após debugPlayersExtras: {count}");
-
-        bool show;
-
-        if (debugMostrarBotaoSempre)
-        {
-            show = true;
-            Debug.Log("[DEBUG] Botão iniciar forçado para aparecer.");
-        }
-        else
-        {
-            show = runner.IsSharedModeMasterClient && count >= 2;
-        }
-
-        Debug.Log($"[LOBBY] Mostrar botão iniciar: {show}");
-
-        if (btnIniciarPartida != null)
-            btnIniciarPartida.gameObject.SetActive(show);
-
-        Debug.Log("===========================");
+        Debug.Log("Conectado ao Photon");
     }
 
-    // =========================
-    // INICIAR PARTIDA
-    // =========================
-    public void IniciarPartida()
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        Debug.Log($"[START] Botão clicado por Player {runner.LocalPlayer.PlayerId}");
-
-        RPC_IniciarPartida();
+        Debug.Log("Desconectado: " + reason);
     }
 
-    // =========================
-    // RPC
-    // =========================
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_IniciarPartida()
-    {
-        if (partidaIniciada)
-            return;
-
-        partidaIniciada = true;
-
-        int indexLocal = -1;
-        int index = 0;
-
-        foreach (var p in runner.ActivePlayers)
-        {
-            if (p == runner.LocalPlayer)
-                indexLocal = index;
-
-            index++;
-        }
-
-        if (indexLocal == 0)
-        {
-            Debug.Log("Player 1 -> Fase1");
-            SceneManager.LoadScene("Fase1");
-        }
-        else
-        {
-            Debug.Log("Player 2 -> Fase2");
-            SceneManager.LoadScene("Fase2");
-        }
-    }
-
-    // =========================
-    // CALLBACKS OBRIGATÓRIOS
-    // =========================
-    public void OnConnectedToServer(NetworkRunner runner) { }
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
     public void OnInput(NetworkRunner runner, NetworkInput input) { }
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
-    public void OnSceneLoadStart(NetworkRunner runner) { }
-    public void OnSceneLoadDone(NetworkRunner runner) { }
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, System.ArraySegment<byte> data) { }
     public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+    public void OnSceneLoadDone(NetworkRunner runner) { }
+    public void OnSceneLoadStart(NetworkRunner runner) { }
     public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
-    public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
 }
