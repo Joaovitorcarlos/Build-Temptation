@@ -101,15 +101,11 @@ public class MultiplayerController : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("BOTAO CLICADO");
 
         if (networkGameManager == null)
-        {
             networkGameManager = FindObjectOfType<NetworkGameManager>(true);
-        }
-
-        Debug.Log("networkGameManager = " + networkGameManager);
 
         if (networkGameManager == null)
         {
-            Debug.LogError("NetworkGameManager não encontrado na cena");
+            Debug.LogError("NetworkGameManager não encontrado");
             return;
         }
 

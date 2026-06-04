@@ -283,7 +283,6 @@ GameObject:
   - component: {fileID: 222985225}
   - component: {fileID: 222985228}
   - component: {fileID: 222985227}
-  - component: {fileID: 222985226}
   m_Layer: 5
   m_Name: Pontuacao
   m_TagString: Untagged
@@ -310,20 +309,6 @@ RectTransform:
   m_AnchoredPosition: {x: 1141, y: -879}
   m_SizeDelta: {x: 270.8, y: 476.09998}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &222985226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 222985224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60ab0de93b49c2940bae3506d69eaed7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pontosMenager: 0
-  pontosText: {fileID: 222985227}
 --- !u!114 &222985227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -837,7 +822,7 @@ RectTransform:
   - {fileID: 172359501}
   - {fileID: 1516007459}
   - {fileID: 1557900552}
-  m_Father: {fileID: 1365872540}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -890,7 +875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objeto: {fileID: 1557900551}
   pontosText: {fileID: 222985227}
-  pontos: 0
+  FimDaPartida: 10
 --- !u!1 &899163201
 GameObject:
   m_ObjectHideFlags: 0
@@ -1355,8 +1340,7 @@ Transform:
   m_LocalPosition: {x: -1024, y: -767, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 823223691}
+  m_Children: []
   m_Father: {fileID: 1342177839}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1365872541
@@ -2510,4 +2494,5 @@ SceneRoots:
   - {fileID: 1826450141}
   - {fileID: 1842068624}
   - {fileID: 1077697530}
+  - {fileID: 823223691}
   - {fileID: 1342177839}

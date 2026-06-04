@@ -5,80 +5,41 @@ using UnityEngine.SceneManagement;
 
 public class NetworkGameManager : NetworkBehaviour
 {
-    [Networked]
-    public bool MatchStarted { get; set; }
-
-    private bool loaded;
-
     public override void Spawned()
     {
-        Debug.Log($"[NetworkGameManager] Spawned");
-        Debug.Log($"LocalPlayer: {Runner.LocalPlayer.PlayerId}");
-        Debug.Log($"HasStateAuthority: {Object.HasStateAuthority}");
-        Debug.Log($"StateAuthority: {Object.StateAuthority}");
+        Debug.Log("=================================");
+        Debug.Log("[NetworkGameManager] SPAWNED");
+        Debug.Log("LocalPlayer: " + Runner.LocalPlayer.PlayerId);
+        Debug.Log("HasStateAuthority: " + Object.HasStateAuthority);
+        Debug.Log("StateAuthority: " + Object.StateAuthority);
+        Debug.Log("=================================");
     }
 
     public void RequestStartMatch()
     {
-        Debug.Log("RequestStartMatch");
+        Debug.Log("=================================");
+        Debug.Log("[NetworkGameManager] RequestStartMatch");
+        Debug.Log("Quem clicou: " + Runner.LocalPlayer.PlayerId);
+        Debug.Log("=================================");
 
-        if (Object.HasStateAuthority)
-        {
-            Debug.Log("Sou StateAuthority");
-            MatchStarted = true;
-        }
-        else
-        {
-            Debug.Log("Enviando RPC");
-            RPC_RequestStartMatch();
-        }
+        RPC_StartGame();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    private void RPC_RequestStartMatch()
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_StartGame()
     {
-        Debug.Log("RPC recebida");
-
-        if (MatchStarted)
-        {
-            Debug.Log("Match já iniciada");
-            return;
-        }
-
-        MatchStarted = true;
-        Debug.Log("MatchStarted = true");
-    }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (!MatchStarted)
-            return;
-
-        Debug.Log("MatchStarted detectado");
-
-        if (loaded)
-            return;
-
-        loaded = true;
-
-        Debug.Log("Chamando LoadPlayerScene");
-
-        LoadPlayerScene();
-    }
-
-    private void LoadPlayerScene()
-    {
-        Debug.Log("LoadPlayerScene executado");
+        Debug.Log("=================================");
+        Debug.Log("[NetworkGameManager] RPC_StartGame");
+        Debug.Log("LocalPlayer: " + Runner.LocalPlayer.PlayerId);
+        Debug.Log("=================================");
 
         List<PlayerRef> players = new List<PlayerRef>();
 
         foreach (var p in Runner.ActivePlayers)
         {
             players.Add(p);
-            Debug.Log($"Player encontrado: {p.PlayerId}");
+            Debug.Log("Player encontrado: " + p.PlayerId);
         }
-
-        Debug.Log($"Total Players: {players.Count}");
 
         if (players.Count < 2)
         {
@@ -86,42 +47,21 @@ public class NetworkGameManager : NetworkBehaviour
             return;
         }
 
-        PlayerRef primeiro = players[0];
-        PlayerRef segundo = players[1];
+        PlayerRef host = players[0];
+        PlayerRef cliente = players[1];
 
-        Debug.Log($"Primeiro Player: {primeiro.PlayerId}");
-        Debug.Log($"Segundo Player: {segundo.PlayerId}");
-        Debug.Log($"Meu Player: {Runner.LocalPlayer.PlayerId}");
+        Debug.Log("Host: " + host.PlayerId);
+        Debug.Log("Cliente: " + cliente.PlayerId);
 
-        if (Runner.LocalPlayer == primeiro)
+        if (Runner.LocalPlayer == host)
         {
-            Debug.Log("CARREGANDO FASE1");
-
-            if (Application.CanStreamedLevelBeLoaded("Fase1"))
-            {
-                SceneManager.LoadScene("Fase1");
-            }
-            else
-            {
-                Debug.LogError("Fase1 não está no Build Settings");
-            }
+            Debug.Log("HOST -> FASE1");
+            SceneManager.LoadScene("Fase1");
         }
-        else if (Runner.LocalPlayer == segundo)
+        else if (Runner.LocalPlayer == cliente)
         {
-            Debug.Log("CARREGANDO FASE2");
-
-            if (Application.CanStreamedLevelBeLoaded("Fase2"))
-            {
-                SceneManager.LoadScene("Fase2");
-            }
-            else
-            {
-                Debug.LogError("Fase2 não está no Build Settings");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Jogador não identificado");
+            Debug.Log("CLIENTE -> FASE2");
+            SceneManager.LoadScene("Fase2");
         }
     }
 }

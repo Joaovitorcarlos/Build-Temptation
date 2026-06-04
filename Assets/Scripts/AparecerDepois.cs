@@ -8,11 +8,15 @@ public class AparecerDepois : MonoBehaviour
     public GameObject objeto;
     public TMP_Text pontosText;
 
-    [Header("Pontuação")]
-    public int pontos;
+    [Header("Configuração")]
+    public float FimDaPartida = 10f;
+
+    private Pontos pontos;
 
     private void Start()
     {
+        pontos = FindFirstObjectByType<Pontos>();
+
         if (objeto != null)
             objeto.SetActive(false);
 
@@ -21,22 +25,27 @@ public class AparecerDepois : MonoBehaviour
 
     IEnumerator MostrarDepois()
     {
-        yield return new WaitForSeconds(50f);
+        yield return new WaitForSeconds(FimDaPartida);
 
         if (objeto != null)
             objeto.SetActive(true);
+
+        AtualizarPontuacao();
     }
 
     private void Update()
     {
-        if (pontosText != null)
+        if (objeto != null && objeto.activeSelf)
         {
-            pontosText.text = "Pontos: " + pontos;
+            AtualizarPontuacao();
         }
     }
 
-    public void AdicionarPontos(int quantidade)
+    void AtualizarPontuacao()
     {
-        pontos += quantidade;
+        if (pontos != null && pontosText != null)
+        {
+            pontosText.text = "Pontuação Final: " + pontos.pontosMenager;
+        }
     }
 }
