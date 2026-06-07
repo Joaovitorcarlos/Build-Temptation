@@ -17,7 +17,7 @@ public class Pontoforma : MonoBehaviour
 
             if (pontos != null)
             {
-                pontos.pontosMenager++;
+                pontos.pontosMenager += 250;
             }
         }
     }

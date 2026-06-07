@@ -9,7 +9,7 @@ public class AparecerDepois : MonoBehaviour
     public TMP_Text pontosText;
 
     [Header("Configuração")]
-    public float FimDaPartida = 10f;
+    public float FimDaPartida = 50f;
 
     private Pontos pontos;
 

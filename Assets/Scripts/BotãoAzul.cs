@@ -7,6 +7,8 @@ public class BotãoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     public GameObject Plane;
     public GameObject PontoformaAzul;
+    public GameObject OtimoA;
+    public GameObject BomA;
     public float input;
     public float sensitivity = 5;
     bool IsPressed;
@@ -15,12 +17,17 @@ public class BotãoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         Plane.SetActive(true);
         PontoformaAzul.SetActive(false);
+        OtimoA.SetActive(false);
+        BomA.SetActive(false);
+        
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         IsPressed = true;
         PontoformaAzul.SetActive(true);
+        OtimoA.SetActive(true);
+        BomA.SetActive(true);
         Plane.SetActive(!Plane.activeInHierarchy);
     }
 
@@ -29,6 +36,8 @@ public class BotãoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         IsPressed = false;
         Plane.SetActive(true);
         PontoformaAzul.SetActive(false);
+        OtimoA.SetActive(false);
+        BomA.SetActive(false);
     }
     
      void Update()
