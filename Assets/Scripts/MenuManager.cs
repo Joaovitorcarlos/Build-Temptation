@@ -5,6 +5,10 @@ public class MenuManager : MonoBehaviour
 {
     public GameObject optionsMenu;
 
+    [Header("UI Sounds")]
+    public AudioSource audioSource;
+    public AudioClip buttonClickSound;
+
     private bool optionsOpen = false;
     private bool isMuted = false;
 
@@ -14,6 +18,11 @@ public class MenuManager : MonoBehaviour
         optionsOpen = false;
         isMuted = false;
         AudioListener.volume = 1f;
+    }
+
+    public void PlayButtonSound()
+    {
+        audioSource.PlayOneShot(buttonClickSound);
     }
 
     public void PlayGame()
@@ -37,7 +46,6 @@ public class MenuManager : MonoBehaviour
     {
         Application.Quit();
 
-        // it Closes the Unity Editor, just for tests..
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #endif

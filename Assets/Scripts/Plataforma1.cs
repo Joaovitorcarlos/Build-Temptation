@@ -5,12 +5,16 @@ using UnityEngine;
 
 public class Plataforma1 : MonoBehaviour
 {
-   private void OnTriggerEnter(Collider other)
+    [Header("Audio")]
+    public AudioClip hitSound;
+
+    private void OnTriggerEnter(Collider other)
     {
-    if (other.CompareTag("nota"))
+        if (other.CompareTag("nota"))
         {
-        Destroy(other.gameObject);
+            AudioSource.PlayClipAtPoint(hitSound, transform.position);
+
+            Destroy(other.gameObject);
         }
     }
-
 }
