@@ -7,6 +7,7 @@ public class AparecerDepois : MonoBehaviour
     [Header("Referências")]
     public GameObject objeto;
     public TMP_Text pontosText;
+    public GameObject menu;
 
     [Header("Configuração")]
     public float FimDaPartida = 50f;
@@ -20,6 +21,9 @@ public class AparecerDepois : MonoBehaviour
         if (objeto != null)
             objeto.SetActive(false);
 
+        if (menu != null)
+            menu.SetActive(false);
+
         StartCoroutine(MostrarDepois());
     }
 
@@ -29,6 +33,9 @@ public class AparecerDepois : MonoBehaviour
 
         if (objeto != null)
             objeto.SetActive(true);
+
+        if (menu != null)
+            menu.SetActive(true);
 
         AtualizarPontuacao();
     }

@@ -1,17 +1,18 @@
-using System.Collections.Generic;
-using System.Collections;
-using UnityEngine.EventSystems;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class BotãoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class BotaoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     public GameObject Plane;
     public GameObject PontoformaAzul;
     public GameObject OtimoA;
     public GameObject BomA;
-    public float input;
-    public float sensitivity = 5;
-    bool IsPressed;
+
+    private float tempoPressionado;
+    private bool IsPressed;
+
+    [SerializeField]
+    private float tempoMaxClique = 0.2f; // máximo para ser considerado clique
 
     void Start()
     {
@@ -19,37 +20,41 @@ public class BotãoAzul : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         PontoformaAzul.SetActive(false);
         OtimoA.SetActive(false);
         BomA.SetActive(false);
-        
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         IsPressed = true;
-        PontoformaAzul.SetActive(true);
-        OtimoA.SetActive(true);
-        BomA.SetActive(true);
-        Plane.SetActive(!Plane.activeInHierarchy);
+        tempoPressionado = 0f;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         IsPressed = false;
-        Plane.SetActive(true);
+
+        // Só executa se foi um clique rápido
+        if (tempoPressionado <= tempoMaxClique)
+        {
+            PontoformaAzul.SetActive(true);
+            OtimoA.SetActive(true);
+            BomA.SetActive(true);
+
+            Invoke(nameof(DesativarPlataforma), 0.1f); // tempo que fica ativa
+        }
+    }
+
+    void Update()
+    {
+        if (IsPressed)
+        {
+            tempoPressionado += Time.deltaTime;
+        }
+    }
+
+    void DesativarPlataforma()
+    {
         PontoformaAzul.SetActive(false);
         OtimoA.SetActive(false);
         BomA.SetActive(false);
     }
-    
-     void Update()
-    {
-        if (IsPressed){
-            input += sensitivity * Time.deltaTime;
-        }
-            else{
-                input -= sensitivity * Time.deltaTime;
-            }
-        input = Mathf.Clamp(input, 0, 1);
-        
-    }
-
 }
