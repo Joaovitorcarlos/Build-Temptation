@@ -12,12 +12,8 @@ public class AparecerDepois : MonoBehaviour
     [Header("Configuração")]
     public float FimDaPartida = 50f;
 
-    private Pontos pontos;
-
     private void Start()
     {
-        pontos = FindFirstObjectByType<Pontos>();
-
         if (objeto != null)
             objeto.SetActive(false);
 
@@ -50,9 +46,15 @@ public class AparecerDepois : MonoBehaviour
 
     void AtualizarPontuacao()
     {
-        if (pontos != null && pontosText != null)
-        {
-            pontosText.text = "Pontuação Final: " + pontos.pontosMenager;
-        }
+        if (NetworkScoreManager.Instance == null)
+            return;
+
+        int p1 = NetworkScoreManager.Instance.Player1Points;
+        int p2 = NetworkScoreManager.Instance.Player2Points;
+
+        pontosText.text =
+            "Player 1: " + p1 +
+            "\nPlayer 2: " + p2 +
+            "\nTotal: " + (p1 + p2);
     }
 }
