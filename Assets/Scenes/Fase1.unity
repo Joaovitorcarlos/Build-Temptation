@@ -581,18 +581,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MenuButton, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &234162751
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1624,7 +1612,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 948.8, y: -850.1}
-  m_SizeDelta: {x: 270.8, y: 476.09998}
+  m_SizeDelta: {x: 280.4, y: 476.09998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &859834298
 MonoBehaviour:
@@ -1673,10 +1661,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 53.95
-  m_fontSizeBase: 32.7
+  m_fontSize: 52.4
+  m_fontSizeBase: 52.4
   m_fontWeight: 400
-  m_enableAutoSizing: 1
+  m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 17
@@ -1709,7 +1697,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -275.97232, w: 379.4367}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2050,7 +2038,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1292380161}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 4f4e00dd9c586ba4d83a457bdc8f4bb0, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: a4e1a8ea9bc925c49a5fcd72f6039830, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -2061,18 +2049,18 @@ VideoPlayer:
   m_RenderMode: 3
   m_AspectRatio: 2
   m_DataSource: 0
-  m_TimeUpdateMode: 2
+  m_TimeUpdateMode: 0
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 2
   m_TargetAudioSources:
   - {fileID: 0}
   m_DirectAudioVolumes:
-  - 0.09
+  - 0.2
   m_Url: 
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 0
   m_WaitForFirstFrame: 1
@@ -2711,6 +2699,7 @@ GameObject:
   - component: {fileID: 1782368714}
   - component: {fileID: 1782368713}
   - component: {fileID: 1782368717}
+  - component: {fileID: 1782368718}
   m_Layer: 0
   m_Name: GameManeger (2)
   m_TagString: Untagged
@@ -2735,7 +2724,7 @@ MonoBehaviour:
   object2: {fileID: 250027117}
   fadeInStart: 8
   fadeInDuration: 1
-  fadeOutStart: 44
+  fadeOutStart: 47.85
   fadeOutDuration: 1
 --- !u!114 &1782368714
 MonoBehaviour:
@@ -2753,7 +2742,7 @@ MonoBehaviour:
   notaAzulPrefab: {fileID: 3858567060797436403, guid: b862ab1b4bedfe24e89856adc726adac, type: 3}
   spawnerEsquerda: {fileID: 839548561}
   spawnerDireita: {fileID: 1767032318}
-  offset: 6.09
+  offset: 8
 --- !u!114 &1782368715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2768,6 +2757,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pontos
   pontosMenager: 0
   pontosText: {fileID: 539952996}
+  pontosText2: {fileID: 859834298}
   audioSource: {fileID: 873873327}
   hitSound: {fileID: 8300000, guid: 8a5efc99001f43a4bab72a6d5de3f7c2, type: 3}
 --- !u!4 &1782368716
@@ -2797,6 +2787,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd4b6b3c49a6a8f4ea0850959d189c8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1782368718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782368712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a94fdd12d88945c458f641919d929fc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoPlayer: {fileID: 1292380162}
 --- !u!1 &1844191271
 GameObject:
   m_ObjectHideFlags: 0

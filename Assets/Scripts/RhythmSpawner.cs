@@ -153,22 +153,19 @@ public class RhythmSpawner : MonoBehaviour
         };
     }
 
-    void Update()
+void Update()
+{
+    if (indiceAtual >= notas.Count) return;
+
+    double songTime = SongClock.Instance.GetSongTime();
+    SpawnNote notaAtual = notas[indiceAtual];
+
+    if (songTime >= notaAtual.tempo + offset)
     {
-        timer += Time.deltaTime;
-
-        if (indiceAtual >= notas.Count)
-            return;
-
-        SpawnNote notaAtual = notas[indiceAtual];
-
-        // Spawn sincronizado com offset
-        if (timer >= notaAtual.tempo + offset)
-        {
-            SpawnarNota(notaAtual);
-            indiceAtual++;
-        }
+        SpawnarNota(notaAtual);
+        indiceAtual++;
     }
+}
 
     void SpawnarNota(SpawnNote nota)
     {
